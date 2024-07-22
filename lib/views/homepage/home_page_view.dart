@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/utils/palletes.dart';
-import 'package:myapp/views/homepage/contact_list_view.dart';
-import 'package:myapp/views/homepage/profile_view.dart';
+import 'package:myapp/views/homepage/contact/contact_list_view.dart';
+import 'package:myapp/views/profile/profile_view.dart';
 
 class HomePageView extends StatefulWidget {
   final String id;
@@ -16,6 +16,7 @@ class HomePageView extends StatefulWidget {
 class HomePageViewState extends State<HomePageView> {
   int _selectedIndex = 0;
   List<Widget> _pages = [];
+  final PageController pageController = PageController();
 
   @override
   void initState() {
@@ -30,13 +31,22 @@ class HomePageViewState extends State<HomePageView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: pageController,
+        children: _pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (value) {
           setState(() {
             _selectedIndex = value;
           });
+          pageController.animateToPage(
+            _selectedIndex,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.bounceIn,
+          );
         },
         backgroundColor: Palette.white,
         showSelectedLabels: false,

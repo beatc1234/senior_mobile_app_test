@@ -28,6 +28,7 @@ class ContactDetailState extends State<ContactDetailView> {
   @override
   void initState() {
     contact = widget.contact ?? ContactModel();
+
     super.initState();
   }
 
@@ -55,6 +56,7 @@ class ContactDetailState extends State<ContactDetailView> {
             color: Palette.black,
           ),
         ),
+        titleSpacing: 0.0,
         title: Text(
           widget.updateProfile ? 'Update Profile' : 'Contact Details',
           style: TextStyle(
@@ -142,7 +144,7 @@ class ContactDetailState extends State<ContactDetailView> {
                     onPressed: () {
                       if (_formKey.currentState?.validate() == true) {
                         _formKey.currentState!.save();
-                        if (widget.contact == null) {
+                        if (widget.contact?.id == null) {
                           contact.id = generateRandomString(10);
                         } else {
                           contact.id = widget.contact!.id;
@@ -202,9 +204,9 @@ class ContactDetailState extends State<ContactDetailView> {
     return CircleAvatar(
       radius: 40.0,
       backgroundColor: Palette.blue,
-      child: widget.contact != null
+      child: widget.contact?.nameAbbr != null
           ? Text(
-              widget.contact!.nameAbbr,
+              widget.contact!.nameAbbr ?? '',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 40.0,
@@ -281,6 +283,16 @@ class ContactDetailState extends State<ContactDetailView> {
               model[attr] = newValue;
               contact = ContactModel.fromJson(model);
             });
+          },
+          onChanged: (value) {
+            if (attr == 'firstName') {
+              contact.firstName = value;
+              setState(() {});
+            }
+            if (attr == 'lastName') {
+              contact.lastName = value;
+              setState(() {});
+            }
           },
           initialValue: value,
           validator: (value) {

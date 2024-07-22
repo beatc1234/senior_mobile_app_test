@@ -16,10 +16,9 @@ class ContactListView extends StatefulWidget {
   }
 }
 
-class ContactListViewState extends State<ContactListView> {
+class ContactListViewState extends State<ContactListView>
+    with AutomaticKeepAliveClientMixin {
   List<ContactModel> contacts = [];
-  List<ContactModel> newContacts = [];
-  List<String> deleted = [];
   Map<String, List<ContactModel>> _groupedData = {};
   Map<String, List<ContactModel>> _groupedDataCpy = {};
   final ContactController _contactController = ContactController();
@@ -46,14 +45,14 @@ class ContactListViewState extends State<ContactListView> {
     await _contactController.loadUsersFromJson().then((value) {
       setState(() {
         contacts = value;
-        contacts
-            .sort((a, b) => (a.firstName ?? '').compareTo(b.firstName ?? ''));
         groupContacts();
       });
     });
   }
 
   void groupContacts() {
+    contacts.sort((a, b) => ((a.firstName ?? '').toLowerCase())
+        .compareTo((b.firstName ?? '').toLowerCase()));
     for (var item in contacts) {
       if (!_groupedData.containsKey(item.firstName![0].toUpperCase())) {
         _groupedData[item.firstNameFirstLetter] = [item];
@@ -71,6 +70,7 @@ class ContactListViewState extends State<ContactListView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
         appBar: AppBar(
           surfaceTintColor: Palette.white,
@@ -121,6 +121,11 @@ class ContactListViewState extends State<ContactListView> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   suffixIcon: const Icon(Icons.search),
+                  suffixIconColor: WidgetStateColor.resolveWith(
+                    (states) => states.contains(WidgetState.focused)
+                        ? Palette.blue
+                        : Palette.gray,
+                  ),
                 ),
                 onTapOutside: (event) {
                   FocusManager.instance.primaryFocus?.unfocus();
@@ -186,15 +191,15 @@ class ContactListViewState extends State<ContactListView> {
                                     ),
                                   ).then((val) {
                                     if (val is ContactModel) {
-                                      setState(() {
-                                        items[index] = val;
-                                      });
+                                      items[index] = val;
+                                      groupContacts();
+                                      resetGroup();
+                                      groupContacts();
+                                      setState(() {});
                                     }
                                     if (val is String) {
-                                      deleted.add(val);
                                       contacts.removeWhere(
                                           (element) => element.id == val);
-                                      contacts.addAll(newContacts);
                                       resetGroup();
                                       groupContacts();
                                       setState(() {});
@@ -206,7 +211,7 @@ class ContactListViewState extends State<ContactListView> {
                                     radius: 30.0,
                                     backgroundColor: Palette.blue,
                                     child: Text(
-                                      items[index].nameAbbr,
+                                      items[index].nameAbbr ?? '',
                                       style: TextStyle(
                                         color: Palette.white,
                                         fontSize: 25.0,
@@ -263,10 +268,7 @@ class ContactListViewState extends State<ContactListView> {
             ).then((val) {
               if (val is ContactModel) {
                 setState(() {
-                  newContacts.add(val);
-                  contacts.addAll(newContacts);
-                  contacts
-                      .removeWhere((element) => deleted.contains(element.id));
+                  contacts.add(val);
                   resetGroup();
                   groupContacts();
                 });
@@ -284,4 +286,7 @@ class ContactListViewState extends State<ContactListView> {
           ),
         ));
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

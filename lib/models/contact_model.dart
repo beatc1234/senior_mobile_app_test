@@ -39,13 +39,13 @@ class ContactModel {
     return fullname;
   }
 
-  String get nameAbbr {
-    String abbr = '';
-    if (firstName != null) {
-      abbr += firstName![0].toUpperCase();
+  String? get nameAbbr {
+    String? abbr;
+    if (firstName != null && firstName!.isNotEmpty) {
+      abbr = (abbr ?? '') + firstName![0].toUpperCase();
     }
-    if (lastName != null) {
-      abbr += lastName![0].toUpperCase();
+    if (lastName != null && lastName!.isNotEmpty) {
+      abbr = (abbr ?? '') + lastName![0].toUpperCase();
     }
     return abbr;
   }

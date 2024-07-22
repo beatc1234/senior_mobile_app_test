@@ -111,7 +111,7 @@ class ProfileViewState extends State<ProfileView> {
                 fontWeight: FontWeight.w100,
               ),
             ),
-            const SizedBox(height: 18.0),
+            const SizedBox(height: 25.0),
             SizedBox(
               width: double.infinity,
               height: 60.0,
